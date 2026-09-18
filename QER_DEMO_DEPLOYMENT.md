@@ -1,5 +1,7 @@
 # QER Document Approval & e-Signature Portal — Management Demo
 
+> Deployment trigger: QER Vercel production branch initialized.
+
 This branch is an isolated QER management demo based on Documenso.
 
 ## Isolation
