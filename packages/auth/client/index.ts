@@ -355,5 +355,11 @@ export class AuthClient {
 }
 
 export const authClient = new AuthClient({
-  baseUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/api/auth`,
+  // Browser auth should always stay on the current QER portal origin.
+  // This prevents a stale/custom NEXT_PUBLIC_WEBAPP_URL from sending login
+  // or signup requests to an unrelated hostname.
+  baseUrl:
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/api/auth`
+      : `${NEXT_PUBLIC_WEBAPP_URL()}/api/auth`,
 });
