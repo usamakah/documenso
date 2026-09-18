@@ -161,3 +161,6 @@ NEXT_PUBLIC_DISABLE_SIGNUP=true
 ```
 
 Then invite/create only the users needed for the presentation.
+
+
+> Vercel root/framework settings corrected; rebuilding QER portal from repository root.
