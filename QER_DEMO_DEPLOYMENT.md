@@ -164,3 +164,6 @@ Then invite/create only the users needed for the presentation.
 
 
 > Vercel root/framework settings corrected; rebuilding QER portal from repository root.
+
+
+> Email transport refresh: production redeploy requested after QER-only Resend key was added.
