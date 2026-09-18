@@ -50,6 +50,14 @@ ENV HUSKY=0
 ENV DOCKER_OUTPUT=1
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# QER demo public URL must be present at BUILD TIME because the auth client
+# bakes NEXT_PUBLIC_WEBAPP_URL into the browser bundle.
+ARG NEXT_PUBLIC_WEBAPP_URL="https://qer-documents-demo.vercel.app"
+ENV NEXT_PUBLIC_WEBAPP_URL="$NEXT_PUBLIC_WEBAPP_URL"
+
+ARG NEXT_PUBLIC_SIGNING_CONTACT_INFO="https://qer-documents-demo.vercel.app"
+ENV NEXT_PUBLIC_SIGNING_CONTACT_INFO="$NEXT_PUBLIC_SIGNING_CONTACT_INFO"
+
 # Encryption keys
 ARG NEXT_PRIVATE_ENCRYPTION_KEY="CAFEBABE"
 ENV NEXT_PRIVATE_ENCRYPTION_KEY="$NEXT_PRIVATE_ENCRYPTION_KEY"
@@ -103,6 +111,8 @@ FROM base AS runner
 
 ENV HUSKY=0
 ENV DOCKER_OUTPUT=1
+ENV NEXT_PUBLIC_WEBAPP_URL="https://qer-documents-demo.vercel.app"
+ENV NEXT_PUBLIC_SIGNING_CONTACT_INFO="https://qer-documents-demo.vercel.app"
 
 # Telemetry credentials (baked into image at build time, can be disabled at runtime)
 ARG NEXT_PRIVATE_TELEMETRY_KEY=""
