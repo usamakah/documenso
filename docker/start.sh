@@ -7,19 +7,6 @@ printf "🚀 Starting QER Document Portal...\n\n"
 # ---------------------------------------------------------------------------
 # QER management demo bootstrap
 # ---------------------------------------------------------------------------
-# Keep secrets out of the public fork. A single stable QER_DEMO_MASTER_SECRET
-# can be stored as a sensitive Vercel environment variable; the application
-# derives separate auth/encryption values at runtime.
-if [ -n "${QER_DEMO_MASTER_SECRET:-}" ]; then
-    derive_secret() {
-        printf '%s' "${QER_DEMO_MASTER_SECRET}:$1" | sha256sum | awk '{print $1}'
-    }
-
-    export NEXTAUTH_SECRET="${NEXTAUTH_SECRET:-$(derive_secret auth)}"
-    export NEXT_PRIVATE_ENCRYPTION_KEY="${NEXT_PRIVATE_ENCRYPTION_KEY:-$(derive_secret encryption-primary)}"
-    export NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="${NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY:-$(derive_secret encryption-secondary)}"
-fi
-
 # Map Supabase/Vercel integration variables to Documenso's expected variables.
 # POSTGRES_PRISMA_URL is the pooled Prisma runtime URL.
 # POSTGRES_URL_NON_POOLING is supplied by the Supabase Vercel integration as
@@ -31,6 +18,23 @@ fi
 
 if [ -z "${NEXT_PRIVATE_DIRECT_DATABASE_URL:-}" ]; then
     export NEXT_PRIVATE_DIRECT_DATABASE_URL="${POSTGRES_URL_NON_POOLING:-${POSTGRES_URL:-${POSTGRES_PRISMA_URL:-}}}"
+fi
+
+
+# Keep secrets out of the public fork. Prefer an explicit QER_DEMO_MASTER_SECRET.
+# For this isolated management demo only, fall back to the private database URL
+# injected by the dedicated Supabase/Vercel integration. This gives us a stable,
+# non-public secret source without reusing any other application's credentials.
+QER_SECRET_SOURCE="${QER_DEMO_MASTER_SECRET:-${NEXT_PRIVATE_DATABASE_URL:-}}"
+
+if [ -n "${QER_SECRET_SOURCE:-}" ]; then
+    derive_secret() {
+        printf '%s' "${QER_SECRET_SOURCE}:$1" | sha256sum | awk '{print $1}'
+    }
+
+    export NEXTAUTH_SECRET="${NEXTAUTH_SECRET:-$(derive_secret auth)}"
+    export NEXT_PRIVATE_ENCRYPTION_KEY="${NEXT_PRIVATE_ENCRYPTION_KEY:-$(derive_secret encryption-primary)}"
+    export NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="${NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY:-$(derive_secret encryption-secondary)}"
 fi
 
 # Resolve the deployed web URL automatically where possible.
@@ -70,7 +74,7 @@ export NEXT_PUBLIC_SIGNING_CONTACT_INFO="${NEXT_PUBLIC_SIGNING_CONTACT_INFO:-${N
 # demo when a real certificate has not been supplied. Each signed PDF embeds
 # the certificate used at signing time. Production should replace this with a
 # persistent organisation-owned certificate/HSM.
-if [ -z "${NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS:-}" ] && [ -z "${NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH:-}" ] && [ -n "${QER_DEMO_MASTER_SECRET:-}" ]; then
+if [ -z "${NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS:-}" ] && [ -z "${NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH:-}" ] && [ -n "${QER_SECRET_SOURCE:-}" ]; then
     CERT_DIR="/tmp/qer-documenso-cert"
     mkdir -p "$CERT_DIR"
 
@@ -103,7 +107,7 @@ if [ -z "${NEXT_PRIVATE_DATABASE_URL:-}" ] || [ -z "${NEXT_PRIVATE_DIRECT_DATABA
 fi
 
 if [ -z "${NEXTAUTH_SECRET:-}" ] || [ -z "${NEXT_PRIVATE_ENCRYPTION_KEY:-}" ] || [ -z "${NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY:-}" ]; then
-    printf "❌ QER demo secrets are not configured. Add QER_DEMO_MASTER_SECRET as a sensitive Vercel environment variable.\n"
+    printf "❌ QER demo secrets are not configured. Connect the dedicated Supabase project or add QER_DEMO_MASTER_SECRET.\n"
     exit 1
 fi
 
