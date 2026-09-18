@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react';
 import { Link, redirect, useSearchParams } from 'react-router';
 
 import { SignInForm } from '~/components/forms/signin';
+import { BrandingLogo } from '~/components/general/branding-logo';
 import { SIGNUP_ERROR_MESSAGES } from '~/components/forms/signup';
 import { appMetaTags } from '~/utils/meta';
 
@@ -31,19 +32,15 @@ export function meta() {
 export async function loader({ request }: Route.LoaderArgs) {
   const { isAuthenticated } = await getOptionalSession(request);
 
-  // SSR env variables.
   const isEmailPasswordSigninEnabled = isSigninEnabledForProvider('email');
   const isGoogleSSOEnabled = IS_GOOGLE_SSO_ENABLED && isSigninEnabledForProvider('google');
   const isMicrosoftSSOEnabled = IS_MICROSOFT_SSO_ENABLED && isSigninEnabledForProvider('microsoft');
   const isOIDCSSOEnabled = IS_OIDC_SSO_ENABLED && isSigninEnabledForProvider('oidc');
 
-  // Automatically redirect to OIDC when it is the only enabled signin transport,
-  // unless the redirect has been explicitly disabled via env.
   const isOIDCOnlyTransport =
     isOIDCSSOEnabled && !isEmailPasswordSigninEnabled && !isGoogleSSOEnabled && !isMicrosoftSSOEnabled;
 
   const shouldAutoRedirectToOIDC = isOIDCOnlyTransport && !IS_OIDC_AUTO_REDIRECT_DISABLED;
-
   const oidcProviderLabel = OIDC_PROVIDER_LABEL;
 
   const isSignupEnabled =
@@ -53,7 +50,6 @@ export async function loader({ request }: Route.LoaderArgs) {
     (IS_OIDC_SSO_ENABLED && isSignupEnabledForProvider('oidc'));
 
   let returnTo = new URL(request.url).searchParams.get('returnTo') ?? undefined;
-
   returnTo = isValidReturnTo(returnTo) ? normalizeReturnTo(returnTo) : undefined;
 
   if (isAuthenticated) {
@@ -85,7 +81,6 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
   } = loaderData;
 
   const { _ } = useLingui();
-
   const [searchParams] = useSearchParams();
   const [isEmbeddedRedirect, setIsEmbeddedRedirect] = useState(false);
 
@@ -94,9 +89,7 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
 
   useEffect(() => {
     const hash = window.location.hash.slice(1);
-
     const params = new URLSearchParams(hash);
-
     setIsEmbeddedRedirect(params.get('embedded') === 'true');
   }, []);
 
@@ -123,18 +116,15 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="w-screen max-w-lg px-4">
-      <div className="z-10 rounded-xl border border-border bg-neutral-100 p-6 dark:bg-background">
+      <div className="z-10 rounded-xl border border-border bg-neutral-100 p-6 shadow-sm dark:bg-background">
         {signupError && (
           <Alert variant="destructive" className="mb-4">
             <AlertDescription>{_(signupError)}</AlertDescription>
           </Alert>
         )}
 
-        <div className="mb-5 rounded-lg border border-primary/20 bg-primary/10 px-4 py-3">
-          <p className="font-semibold text-primary text-sm">Quality Equipment Rental LLC</p>
-          <p className="mt-1 text-muted-foreground text-xs">
-            Secure document approvals, signatures and audit history
-          </p>
+        <div className="mb-5 flex justify-center rounded-lg border border-primary/15 bg-white px-6 py-4 dark:bg-white">
+          <BrandingLogo className="h-20 w-auto max-w-full" />
         </div>
 
         <h1 className="font-semibold text-2xl">
@@ -161,13 +151,17 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
               Don't have an account?{' '}
               <Link
                 to={returnTo ? `/signup?returnTo=${encodeURIComponent(returnTo)}` : '/signup'}
-                className="text-documenso-700 duration-200 hover:opacity-70"
+                className="text-primary duration-200 hover:opacity-70"
               >
                 Sign up
               </Link>
             </Trans>
           </p>
         )}
+
+        <p className="mt-5 text-center text-[11px] text-muted-foreground">
+          Internal management demo · Quality Equipment Rental LLC
+        </p>
       </div>
     </div>
   );
