@@ -130,12 +130,19 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
           </Alert>
         )}
 
+        <div className="mb-5 rounded-lg border border-primary/20 bg-primary/10 px-4 py-3">
+          <p className="font-semibold text-primary text-sm">Quality Equipment Rental LLC</p>
+          <p className="mt-1 text-muted-foreground text-xs">
+            Secure document approvals, signatures and audit history
+          </p>
+        </div>
+
         <h1 className="font-semibold text-2xl">
-          <Trans>Sign in to your account</Trans>
+          <Trans>Sign in to QER Documents</Trans>
         </h1>
 
         <p className="mt-2 text-muted-foreground text-sm">
-          <Trans>Welcome back, we are lucky to have you.</Trans>
+          <Trans>QER Document Approval & e-Signature Portal</Trans>
         </p>
         <hr className="-mx-6 my-4" />
 
