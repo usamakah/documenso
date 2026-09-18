@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="QER">
+  <rect width="128" height="128" rx="22" fill="#283C93"/>
+  <text x="58" y="79" text-anchor="middle" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="800" letter-spacing="-4">QER</text>
+  <path d="M96 18H128V50L96 18Z" fill="#EF1D26"/>
+</svg>

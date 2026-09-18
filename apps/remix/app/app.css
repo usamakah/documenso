@@ -1,5 +1,26 @@
 @import "@documenso/ui/styles/theme.css";
 
+/*
+ * QER management demo branding.
+ * Official QER blue sampled from the supplied company logo: #283C93.
+ */
+@layer base {
+  :root,
+  .dark-mode-disabled {
+    --primary: 228 57% 37%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 228 57% 37%;
+    --field-card-border: 228 57% 37%;
+    --card-border-tint: 40 60 147;
+  }
+
+  .dark:not(.dark-mode-disabled) {
+    --primary: 228 60% 62%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 228 60% 62%;
+  }
+}
+
 /* Inter Variable Fonts */
 @font-face {
   font-family: "Inter";
