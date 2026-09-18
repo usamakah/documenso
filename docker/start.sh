@@ -37,16 +37,18 @@ if [ -n "${QER_SECRET_SOURCE:-}" ]; then
     export NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="${NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY:-$(derive_secret encryption-secondary)}"
 fi
 
-# Resolve the deployed web URL automatically where possible.
-if [ -z "${NEXT_PUBLIC_WEBAPP_URL:-}" ]; then
-    if [ -n "${VERCEL_PROJECT_PRODUCTION_URL:-}" ]; then
-        export NEXT_PUBLIC_WEBAPP_URL="https://${VERCEL_PROJECT_PRODUCTION_URL}"
-    elif [ -n "${VERCEL_URL:-}" ]; then
-        export NEXT_PUBLIC_WEBAPP_URL="https://${VERCEL_URL}"
-    fi
+# Use the actual Vercel production hostname for this isolated demo.
+# Do not trust an external custom hostname until its DNS is explicitly mapped
+# to this Vercel project; otherwise verification/signing links can point away.
+if [ -n "${VERCEL_PROJECT_PRODUCTION_URL:-}" ]; then
+    export NEXT_PUBLIC_WEBAPP_URL="https://${VERCEL_PROJECT_PRODUCTION_URL}"
+elif [ -n "${VERCEL_URL:-}" ]; then
+    export NEXT_PUBLIC_WEBAPP_URL="https://${VERCEL_URL}"
+else
+    export NEXT_PUBLIC_WEBAPP_URL="${NEXT_PUBLIC_WEBAPP_URL:-https://qer-documents-demo.vercel.app}"
 fi
 
-export NEXT_PRIVATE_INTERNAL_WEBAPP_URL="${NEXT_PRIVATE_INTERNAL_WEBAPP_URL:-${NEXT_PUBLIC_WEBAPP_URL:-http://localhost:3000}}"
+export NEXT_PRIVATE_INTERNAL_WEBAPP_URL="${NEXT_PUBLIC_WEBAPP_URL}"
 
 # Real transactional email. Prefer a dedicated domain-scoped key in
 # NEXT_PRIVATE_RESEND_API_KEY. RESEND_API_KEY is accepted as a Vercel
@@ -68,7 +70,7 @@ export NEXT_PUBLIC_FEATURE_BILLING_ENABLED="${NEXT_PUBLIC_FEATURE_BILLING_ENABLE
 export NEXT_PRIVATE_JOBS_PROVIDER="${NEXT_PRIVATE_JOBS_PROVIDER:-local}"
 export DOCUMENSO_DISABLE_TELEMETRY="${DOCUMENSO_DISABLE_TELEMETRY:-true}"
 export NEXT_PRIVATE_SIGNING_REASON="${NEXT_PRIVATE_SIGNING_REASON:-Approved and signed through QER Document Portal}"
-export NEXT_PUBLIC_SIGNING_CONTACT_INFO="${NEXT_PUBLIC_SIGNING_CONTACT_INFO:-${NEXT_PUBLIC_WEBAPP_URL:-QER Document Portal}}"
+export NEXT_PUBLIC_SIGNING_CONTACT_INFO="${NEXT_PUBLIC_WEBAPP_URL}"
 
 # Generate an ephemeral self-signed signing certificate for the management
 # demo when a real certificate has not been supplied. Each signed PDF embeds
@@ -127,5 +129,8 @@ fi
 printf "🗄️  Running database migrations...\n"
 npx prisma migrate deploy --schema ../../packages/prisma/schema.prisma
 
+printf "🌐 Public URL: %s\n" "${NEXT_PUBLIC_WEBAPP_URL}"
+printf "📧 Email transport: %s\n" "${NEXT_PRIVATE_SMTP_TRANSPORT:-smtp-auth}"
+printf "✉️  Sender: %s <%s>\n" "${NEXT_PRIVATE_SMTP_FROM_NAME:-}" "${NEXT_PRIVATE_SMTP_FROM_ADDRESS:-}"
 printf "🌟 Starting QER Document Portal server...\n"
 HOSTNAME=0.0.0.0 node build/server/main.js
