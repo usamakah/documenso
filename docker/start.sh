@@ -37,17 +37,9 @@ if [ -n "${QER_SECRET_SOURCE:-}" ]; then
     export NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="${NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY:-$(derive_secret encryption-secondary)}"
 fi
 
-# Use the actual Vercel production hostname for this isolated demo.
-# Do not trust an external custom hostname until its DNS is explicitly mapped
-# to this Vercel project; otherwise verification/signing links can point away.
-if [ -n "${VERCEL_PROJECT_PRODUCTION_URL:-}" ]; then
-    export NEXT_PUBLIC_WEBAPP_URL="https://${VERCEL_PROJECT_PRODUCTION_URL}"
-elif [ -n "${VERCEL_URL:-}" ]; then
-    export NEXT_PUBLIC_WEBAPP_URL="https://${VERCEL_URL}"
-else
-    export NEXT_PUBLIC_WEBAPP_URL="${NEXT_PUBLIC_WEBAPP_URL:-https://qer-documents-demo.vercel.app}"
-fi
-
+# Pin the demo to the known-good Vercel production URL. The current
+# documents.qer.ae DNS points elsewhere and must not be used for auth/signing.
+export NEXT_PUBLIC_WEBAPP_URL="https://qer-documents-demo.vercel.app"
 export NEXT_PRIVATE_INTERNAL_WEBAPP_URL="${NEXT_PUBLIC_WEBAPP_URL}"
 
 # Real transactional email. Prefer a dedicated domain-scoped key in
