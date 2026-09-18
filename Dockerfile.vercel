@@ -51,12 +51,10 @@ ENV DOCKER_OUTPUT=1
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # QER demo public URL must be present at BUILD TIME because the auth client
-# bakes NEXT_PUBLIC_WEBAPP_URL into the browser bundle.
-ARG NEXT_PUBLIC_WEBAPP_URL="https://qer-documents-demo.vercel.app"
-ENV NEXT_PUBLIC_WEBAPP_URL="$NEXT_PUBLIC_WEBAPP_URL"
-
-ARG NEXT_PUBLIC_SIGNING_CONTACT_INFO="https://qer-documents-demo.vercel.app"
-ENV NEXT_PUBLIC_SIGNING_CONTACT_INFO="$NEXT_PUBLIC_SIGNING_CONTACT_INFO"
+# bakes NEXT_PUBLIC_WEBAPP_URL into the browser bundle. Keep this literal until
+# documents.qer.ae DNS is actually moved to this Vercel project.
+ENV NEXT_PUBLIC_WEBAPP_URL="https://qer-documents-demo.vercel.app"
+ENV NEXT_PUBLIC_SIGNING_CONTACT_INFO="https://qer-documents-demo.vercel.app"
 
 # Encryption keys
 ARG NEXT_PRIVATE_ENCRYPTION_KEY="CAFEBABE"
