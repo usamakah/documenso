@@ -2,22 +2,22 @@
 
 /*
  * QER management demo branding.
- * Keep these overrides at the app layer so upstream Documenso theme files stay easy to update.
+ * Official QER blue sampled from the supplied company logo: #283C93.
  */
 @layer base {
   :root,
   .dark-mode-disabled {
-    --primary: 75 40% 36%;
+    --primary: 228 57% 37%;
     --primary-foreground: 0 0% 100%;
-    --ring: 75 40% 36%;
-    --field-card-border: 75 40% 36%;
-    --card-border-tint: 112 130 56;
+    --ring: 228 57% 37%;
+    --field-card-border: 228 57% 37%;
+    --card-border-tint: 40 60 147;
   }
 
   .dark:not(.dark-mode-disabled) {
-    --primary: 75 42% 52%;
+    --primary: 228 60% 62%;
     --primary-foreground: 0 0% 100%;
-    --ring: 75 42% 52%;
+    --ring: 228 60% 62%;
   }
 }
 
